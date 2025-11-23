@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zen Fisher: AI Ocean</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+      body {
+        font-family: 'Noto Sans SC', sans-serif;
+        overflow: hidden; /* Prevent scrolling on mobile game */
+        touch-action: none;
+      }
+      /* Custom animations for fish in aquarium */
+      @keyframes float {
+        0% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(-10px) translateX(5px); }
+        100% { transform: translateY(0px) translateX(0px); }
+      }
+      @keyframes swim-left {
+        0% { transform: translateX(100vw); }
+        100% { transform: translateX(-20vw); }
+      }
+      @keyframes swim-right {
+        0% { transform: translateX(-20vw) scaleX(-1); }
+        100% { transform: translateX(100vw) scaleX(-1); }
+      }
+      
+      /* New Environment Animations */
+      @keyframes sway {
+        0%, 100% { transform: rotate(-5deg); }
+        50% { transform: rotate(5deg); }
+      }
+      @keyframes sway-slow {
+        0%, 100% { transform: translateX(0) rotate(0deg); }
+        50% { transform: translateX(10px) rotate(2deg); }
+      }
+      @keyframes bubble-rise {
+        0% { bottom: -10%; opacity: 0; transform: translateX(0); }
+        50% { opacity: 0.5; }
+        100% { bottom: 110%; opacity: 0; transform: translateX(20px); }
+      }
+      @keyframes jelly-move {
+        0% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-20px) scale(0.95); }
+        100% { transform: translateY(0) scale(1); }
+      }
+      @keyframes glow-pulse {
+        0%, 100% { opacity: 0.3; transform: scale(1); }
+        50% { opacity: 0.8; transform: scale(1.2); }
+      }
+      @keyframes sun-rays {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      @keyframes snow {
+        0% { transform: translateY(-10vh) translateX(-10px) rotate(0deg); opacity: 0.8; }
+        100% { transform: translateY(110vh) translateX(10px) rotate(360deg); opacity: 0.2; }
+      }
+
+      .animate-float { animation: float 3s ease-in-out infinite; }
+      .animate-sway { animation: sway 4s ease-in-out infinite; transform-origin: bottom center; }
+      .animate-sway-slow { animation: sway-slow 8s ease-in-out infinite; }
+      .animate-jelly { animation: jelly-move 6s ease-in-out infinite; }
+      .animate-glow { animation: glow-pulse 4s ease-in-out infinite; }
+      .animate-spin-slow { animation: sun-rays 60s linear infinite; }
+      .animate-snow { animation: snow 10s linear infinite; }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+  }
+}
+</script>
+</head>
+  <body class="bg-slate-900 text-white select-none">
+    <div id="root"></div>
+  </body>
+</html>
