@@ -1,5 +1,5 @@
 import { DatePicker, message } from "antd";
-import dayjs from "dayjs";
+import moment from "moment";
 import { useState, useMemo, useEffect } from "react";
 
 const { RangePicker } = DatePicker;
@@ -8,8 +8,8 @@ function TimeRangeBar() {
     const MAX_RANGE_YEARS = 3;
     const MAX_GAP_MONTHS = 3;
 
-    const today = dayjs().endOf("day");
-    const minGlobalDate = today
+    const today = moment().endOf("day");
+    const minGlobalDate = moment()
         .subtract(MAX_RANGE_YEARS, "year")
         .startOf("day");
 
@@ -20,34 +20,38 @@ function TimeRangeBar() {
     // 当前用于「请求」的时间范围
     const [requestRange, setRequestRange] = useState(null);
 
+    /**
+     * 请求用时间归一化（闭区间）
+     */
     const normalizeRangeForRequest = ([start, end]) => [
-        start.startOf("day"),
-        end.endOf("day"),
+        start.clone().startOf("day"),
+        end.clone().endOf("day"),
     ];
 
+    /**
+     * 模拟网络请求
+     */
     const mockFetch = (range) => {
         if (!range) return;
 
         const [start, end] = normalizeRangeForRequest(range);
 
         console.log("📡 触发网络请求");
-        console.log("开始时间戳:", start.valueOf());
-        console.log("结束时间戳:", end.valueOf());
+        console.log("开始时间戳:", start.valueOf()); // number, ms
+        console.log("结束时间戳:", end.valueOf()); // number, ms
     };
 
     /**
-     * 初次加载：默认用最近 7 天触发一次请求
-     * 但 Picker 不选中
+     * 初次加载：默认最近 7 天（UI 不选中）
      */
     useEffect(() => {
-        const end = today;
-        const start = today.subtract(7, "day").startOf("day");
-
+        const end = moment().endOf("day");
+        const start = moment().subtract(7, "day").startOf("day");
         setRequestRange([start, end]);
     }, []);
 
     /**
-     * 监听请求时间变化 → 触发请求
+     * 监听请求时间变化
      */
     useEffect(() => {
         if (requestRange) {
@@ -67,18 +71,28 @@ function TimeRangeBar() {
 
             const [start, end] = calendarDates;
 
+            // 已选开始时间
             if (start && !end) {
-                const maxEnd = start.add(MAX_GAP_MONTHS, "month");
+                const maxEnd = start.clone().add(MAX_GAP_MONTHS, "month");
                 const realMaxEnd = maxEnd.isAfter(today) ? today : maxEnd;
-                return current.isBefore(start) || current.isAfter(realMaxEnd);
+
+                return (
+                    current.isBefore(start, "day") ||
+                    current.isAfter(realMaxEnd, "day")
+                );
             }
 
+            // 已选结束时间
             if (!start && end) {
-                const minStart = end.subtract(MAX_GAP_MONTHS, "month");
+                const minStart = end.clone().subtract(MAX_GAP_MONTHS, "month");
                 const realMinStart = minStart.isBefore(minGlobalDate)
                     ? minGlobalDate
                     : minStart;
-                return current.isBefore(realMinStart) || current.isAfter(end);
+
+                return (
+                    current.isBefore(realMinStart, "day") ||
+                    current.isAfter(end, "day")
+                );
             }
 
             return false;
@@ -86,7 +100,7 @@ function TimeRangeBar() {
     }, [calendarDates, today, minGlobalDate]);
 
     /**
-     * 日历面板变化
+     * 日历面板变化（关键）
      */
     const handleCalendarChange = (dates) => {
         setCalendarDates(dates || [null, null]);
